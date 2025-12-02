@@ -271,3 +271,9 @@ Vultr API not available - using localStorage only
 the app doesn't seem to be connecting to the Vultr bucket
 Vultr API not available - using localStorage only
 Vultr is saving images but does not appear to be saving walk data
+let's see if you're working today - I want to add badges for steps walked, photos taken, mindful moments completed, etc
+Unhandled Runtime Error
+ReferenceError: Cannot access 'stepData' before initialization
+
+Source
+src\app\page.tsx (26:6) @ stepData

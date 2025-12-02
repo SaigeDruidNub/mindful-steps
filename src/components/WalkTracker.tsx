@@ -33,6 +33,7 @@ import {
   FileText,
 } from "lucide-react";
 import { useStepCounter } from "@/hooks/useStepCounter";
+import { useBadgeSystem } from "@/hooks/useBadgeSystem";
 import { GalleryManager } from "@/lib/gallery";
 import {
   getRandomPrompt,
@@ -59,6 +60,8 @@ interface WalkStreak {
 }
 
 export function WalkTracker() {
+  const badgeSystem = useBadgeSystem();
+  
   const [stepGoals, setStepGoals] = useState<StepGoal>({
     daily: 5000,
     weekly: 35000,
@@ -234,6 +237,9 @@ export function WalkTracker() {
         },
       });
 
+      // Update badge system
+      badgeSystem.addPhoto();
+
       console.log("📸 Real photo captured and saved to gallery!");
       closeCameraModal();
     } catch (error) {
@@ -253,6 +259,9 @@ export function WalkTracker() {
     if (currentPrompt) {
       setCompletedPrompts((prev) => [...prev, currentPrompt.prompt.id]);
 
+      // Update badge system for mindful break
+      badgeSystem.addMindfulBreak();
+
       // If a photo was captured, save it with prompt context
       if (photoUrl) {
         const photo = GalleryManager.savePhoto({
@@ -268,6 +277,9 @@ export function WalkTracker() {
             longitude: -74.006,
           },
         });
+
+        // Update badge system
+        badgeSystem.addPhoto();
 
         // Sync photo to Vultr if online
         if (photo && isOnline) {
@@ -595,27 +607,31 @@ export function WalkTracker() {
         setStreak({ current: 1, longest: streak.longest, lastWalkDate: today });
       }
 
+      // Update badge system
+      badgeSystem.addWalk();
+      badgeSystem.calculateAndUpdateStreak();
+
       setActiveWalk(null);
     }
   };
 
   const getGoalColor = (progress: number) => {
-    if (progress >= 100) return "text-green-600";
-    if (progress >= 75) return "text-blue-600";
-    if (progress >= 50) return "text-yellow-600";
+    if (progress >= 100) return "text-primary";
+    if (progress >= 75) return "text-primary";
+    if (progress >= 50) return "text-primary";
     return "text-gray-600";
   };
 
   const getGoalMessage = (progress: number) => {
     if (progress >= 100)
-      return { icon: Trophy, text: "Goal achieved!", color: "text-green-600" };
+      return { icon: Trophy, text: "Goal achieved!", color: "text-primary" };
     if (progress >= 75)
-      return { icon: Flame, text: "Almost there!", color: "text-orange-600" };
+      return { icon: Flame, text: "Almost there!", color: "text-primary" };
     if (progress >= 50)
-      return { icon: Zap, text: "Keep going!", color: "text-yellow-600" };
+      return { icon: Zap, text: "Keep going!", color: "text-primary" };
     if (progress >= 25)
-      return { icon: ThumbsUp, text: "Good start!", color: "text-blue-600" };
-    return { icon: Rocket, text: "Let's begin!", color: "text-purple-600" };
+      return { icon: ThumbsUp, text: "Good start!", color: "text-primary" };
+    return { icon: Rocket, text: "Let's begin!", color: "text-primary" };
   };
 
   const formatStreakMessage = (current: number, longest: number) => {

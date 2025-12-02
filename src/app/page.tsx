@@ -5,13 +5,34 @@ import { useStepCounter } from '@/hooks/useStepCounter';
 import { StepCounterDisplay } from '@/components/StepCounterDisplay';
 import { WalkTracker } from '@/components/WalkTracker';
 import { GoogleAuth } from '@/components/GoogleAuth';
+import { BadgeSystem } from '@/components/BadgeSystem';
+import { useBadgeSystem } from '@/hooks/useBadgeSystem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Zap, BarChart3 } from 'lucide-react';
+import { Zap, BarChart3, Trophy } from 'lucide-react';
 
 export default function Home() {
   const [useAdvancedTracker, setUseAdvancedTracker] = useState(true);
+  const [showBadges, setShowBadges] = useState(false);
+  
+  const badgeSystem = useBadgeSystem();
+  
+  const {
+    stepData,
+    isCounting,
+    isSupported,
+    startCounting,
+    stopCounting,
+    reset
+  } = useStepCounter();
+  
+  // Update badge system when step data changes
+  useEffect(() => {
+    if (stepData?.steps) {
+      badgeSystem.updateSteps(stepData.steps);
+    }
+  }, [stepData?.steps, badgeSystem]);
   
   // Load Google Identity Services script
   useEffect(() => {
@@ -25,15 +46,6 @@ export default function Home() {
       document.head.appendChild(script);
     }
   }, []);
-  
-  const {
-    stepData,
-    isCounting,
-    isSupported,
-    startCounting,
-    stopCounting,
-    reset
-  } = useStepCounter();
 
   return (
     <div className="min-h-screen">
@@ -68,7 +80,33 @@ export default function Home() {
             {useAdvancedTracker ? <Zap className="w-4 h-4" /> : <BarChart3 className="w-4 h-4" />}
             {useAdvancedTracker ? 'Simple' : 'Advanced'}
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => setShowBadges(!showBadges)}
+            className="flex-1 flex items-center justify-center gap-2"
+          >
+            <Trophy className="w-4 h-4" />
+            {showBadges ? 'Hide' : 'Show'} Badges
+          </Button>
         </div>
+
+        {/* Badge System */}
+        {showBadges && (
+          <Card className="bg-card">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-center text-xl flex items-center justify-center gap-2">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                Your Achievements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BadgeSystem 
+                dailyStats={badgeSystem.todayStats}
+                totalStats={badgeSystem.totalStats}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Step Counter Display or Walk Tracker */}
         {useAdvancedTracker ? (
