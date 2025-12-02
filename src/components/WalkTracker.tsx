@@ -60,8 +60,10 @@ interface WalkStreak {
 }
 
 export function WalkTracker() {
+  // Show warning if not syncing to Vultr
+  const [showLocalWarning, setShowLocalWarning] = useState(false);
   const badgeSystem = useBadgeSystem();
-  
+
   const [stepGoals, setStepGoals] = useState<StepGoal>({
     daily: 5000,
     weekly: 35000,
@@ -390,6 +392,25 @@ export function WalkTracker() {
     }
   }, [isOnline]);
 
+  // Listen for API availability and trigger sync
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    if (!isOnline) return;
+    interval = setInterval(async () => {
+      const available = await VultrStorageService.isApiAvailable();
+      if (available) {
+        VultrStorageService.syncQueuedData();
+        setShowLocalWarning(false);
+        if (interval) clearInterval(interval);
+      } else {
+        setShowLocalWarning(true);
+      }
+    }, 10000); // check every 10s
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isOnline]);
+
   // Sync data to Vultr storage
   const syncDataToVultr = async () => {
     if (!isOnline) {
@@ -584,30 +605,46 @@ export function WalkTracker() {
 
   const handleEndWalk = () => {
     if (activeWalk) {
-      // Mock updating streak
       const today = new Date().toISOString().split("T")[0];
-      const yesterday = new Date(Date.now() - 86400000)
-        .toISOString()
-        .split("T")[0];
+      const endTime = Date.now();
+      const duration = Math.floor((endTime - activeWalk.startTime) / 60000); // minutes
+      const stepsWalked = stepData.steps - activeWalk.startSteps;
+      const distanceWalked = stepData.distance;
 
+      // Build walk log object
+      const walkLog = {
+        id: activeWalk.id,
+        date: today,
+        startTime: activeWalk.startTime,
+        endTime,
+        steps: stepsWalked,
+        distance: distanceWalked,
+        duration,
+        mindfulBreaksCompleted: completedPrompts.length,
+        // Add more fields as needed (e.g., startLocation, endLocation, notes)
+      };
+
+      // Save to Vultr Object Storage
+      VultrStorageService.saveLog(walkLog).catch((error) => {
+        console.error("Failed to save walk log to Vultr:", error);
+      });
+
+      // Update streak logic
       if (today === streak.lastWalkDate) {
         // Same day, no change
       } else if (
-        today === yesterday ||
+        today === new Date(Date.now() - 86400000).toISOString().split("T")[0] ||
         today === new Date().toISOString().split("T")[0]
       ) {
-        // Consecutive day
         setStreak((prev) => ({
           ...prev,
           current: prev.current + 1,
           longest: prev.current > prev.longest ? prev.current : prev.longest,
         }));
       } else {
-        // Streak broken or new streak
         setStreak({ current: 1, longest: streak.longest, lastWalkDate: today });
       }
 
-      // Update badge system
       badgeSystem.addWalk();
       badgeSystem.calculateAndUpdateStreak();
 
@@ -670,6 +707,31 @@ export function WalkTracker() {
 
   return (
     <div className="space-y-4">
+      {showLocalWarning && (
+        <div
+          className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative flex items-center justify-between"
+          role="alert"
+        >
+          <div>
+            <strong className="font-bold">Warning:</strong>
+            <span className="block sm:inline">
+              {" "}
+              Data is only saved locally and will not sync to the cloud until
+              the Vultr API is available.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="ml-4 text-yellow-800 hover:text-yellow-600 focus:outline-none"
+            aria-label="Close warning"
+            onClick={() => setShowLocalWarning(false)}
+          >
+            <svg className="h-6 w-6 fill-current" viewBox="0 0 20 20">
+              <path d="M10 8.586l4.95-4.95a1 1 0 111.414 1.414L11.414 10l4.95 4.95a1 1 0 01-1.414 1.414L10 11.414l-4.95 4.95a1 1 0 01-1.414-1.414L8.586 10l-4.95-4.95A1 1 0 115.05 3.636L10 8.586z" />
+            </svg>
+          </button>
+        </div>
+      )}
       {/* Camera Modal */}
       {showCameraModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
