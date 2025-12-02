@@ -3,7 +3,13 @@ declare global {
     testGoogleMapsApiKey: typeof testGoogleMapsApiKey;
   }
 }
+export {};
 // Google Maps API testing helper
+declare global {
+  interface Window {
+    testGoogleMapsApiKey: typeof testGoogleMapsApiKey;
+  }
+}
 export function testGoogleMapsApiKey() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 

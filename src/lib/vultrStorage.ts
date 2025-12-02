@@ -217,7 +217,7 @@ export class VultrStorageService {
   }
 
   // Streak Management
-  static async getStreak(): WalkStreak {
+  static async getStreak(): Promise<WalkStreak> {
     const defaultStreak: WalkStreak = {
       current: 0,
       longest: 0,
@@ -570,10 +570,5 @@ export class VultrStorageService {
       console.error("Failed to upload photo to storage:", error);
       return null;
     }
-  }
-
-  // Legacy method for backward compatibility
-  static async uploadPhoto(file: File, walkId: string): Promise<string | null> {
-    return this.uploadPhotoToStorage(file, { walkId });
   }
 }
