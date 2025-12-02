@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Steps - Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#F8E6D3',
+                            100: '#F0D4B3',
+                            200: '#E6B87A',
+                            300: '#D1974E',
+                            400: '#C17F3A',
+                            500: '#A96930',
+                            600: '#8B5728',
+                            700: '#713830',
+                            800: '#5A3028',
+                            900: '#452820',
+                        },
+                        secondary: {
+                            50: '#E6D3C7',
+                            100: '#D1B79D',
+                            200: '#B89573',
+                            300: '#9C7357',
+                            400: '#713830',
+                            500: '#5A2E28',
+                            600: '#452520',
+                            700: '#351D18',
+                            800: '#2A1510',
+                            900: '#1F0F08',
+                        },
+                        tertiary: {
+                            50: '#F8E2D3',
+                            100: '#F0C9B3',
+                            200: '#E6A67A',
+                            300: '#D68754',
+                            400: '#B05833',
+                            500: '#954A2C',
+                            600: '#7A3F24',
+                            700: '#5F321C',
+                            800: '#4A2614',
+                            900: '#351A0C',
+                        },
+                        accent: {
+                            50: '#D3D8E0',
+                            100: '#B8C1D0',
+                            200: '#8B9AB3',
+                            300: '#5E7396',
+                            400: '#3F4C67',
+                            500: '#323F52',
+                            600: '#293344',
+                            700: '#202836',
+                            800: '#1A1E28',
+                            900: '#14141C',
+                        },
+                        muted: {
+                            50: '#F8F6F3',
+                            100: '#F1ECE3',
+                            200: '#E8DDD0',
+                            300: '#C5BDB3',
+                            400: '#9D9588',
+                            500: '#7B7367',
+                            600: '#5F584D',
+                            700: '#484138',
+                            800: '#332B20',
+                            900: '#1F1810',
+                        },
+                        background: {
+                            DEFAULT: '#201724',
+                            50: '#F8E6D3',
+                            100: '#F0D4B3',
+                            200: '#E6B87A',
+                            300: '#D1974E',
+                            400: '#C17F3A',
+                            500: '#A96930',
+                            600: '#8B5728',
+                            700: '#713830',
+                            800: '#5A3028',
+                            900: '#452820',
+                        },
+                        foreground: {
+                            DEFAULT: '#E8E3D3',
+                            50: '#452820',
+                            100: '#5A3028',
+                            200: '#713830',
+                            300: '#8B5728',
+                            400: '#A96930',
+                            500: '#C17F3A',
+                            600: '#D1974E',
+                            700: '#E6B87A',
+                            800: '#F0D4B3',
+                            900: '#F8E6D3',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#201724] via-[#2A1D2E] to-[#332233]">
+    <div class="container mx-auto px-4 py-8 space-y-6 max-w-md">
+        <!-- Header -->
+        <header class="text-center space-y-2">
+            <h1 class="text-4xl font-bold text-primary">Mindful Steps</h1>
+            <p class="text-[#C5BDB3]">
+                Walk with awareness, capture moments of beauty
+            </p>
+            <p class="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                📱 Preview Mode - Install full app for real step counting
+            </p>
+        </header>
+
+        <!-- Step Counter -->
+        <div class="bg-[#2A1D2E] rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-center mb-4">Step Counter</h2>
+            <div class="text-center space-y-6">
+                <!-- Step Count -->
+                <div class="relative">
+                    <div class="text-6xl font-bold text-primary" id="stepCount">0</div>
+                    <div class="text-lg text-gray-500 flex items-center justify-center gap-1 mt-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        steps
+                    </div>
+                </div>
+
+                <!-- Distance -->
+                <div class="text-center">
+                    <div class="text-2xl font-semibold text-[#E8E3D3]" id="distance">0 m</div>
+                    <div class="text-sm text-gray-500">distance</div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="flex gap-3 justify-center">
+                    <button id="startBtn" onclick="startCounting()" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Start Walking
+                    </button>
+                    
+                    <button id="pauseBtn" onclick="stopCounting()" class="hidden border border-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Pause
+                    </button>
+                    
+                    <button onclick="reset()" class="border border-gray-300 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+
+                <!-- Status Indicator -->
+                <div id="status" class="hidden items-center justify-center gap-2">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-sm text-gray-500">Counting steps...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Break Status -->
+        <div class="bg-[#2A1D2E] rounded-lg shadow-lg p-6">
+            <div class="flex items-center gap-2 mb-4">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <h2 class="font-semibold">Mindful Break Status</h2>
+            </div>
+            
+            <div id="breakStatus" class="space-y-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-primary" id="stepsUntilBreak">250</div>
+                    <div class="text-sm text-gray-500">steps until next break</div>
+                </div>
+                
+                <div class="w-full bg-[#332233] rounded-full h-2" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to next mindful break: 0% complete">
+                    <div id="progressBar" class="bg-[#D1974E] h-2 rounded-full progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <section id="stats" class="hidden space-y-4">
+            <h2 class="text-xl font-semibold text-center">Quick Stats</h2>
+            <div class="grid grid-cols-2 gap-4">
+            <div class="bg-[#2A1D2E]/50 backdrop-blur rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold text-primary" id="dailyProgress">0%</div>
+                <div class="text-sm text-[#C5BDB3]">Daily Goal</div>
+            </div>
+            <div class="bg-[#2A1D2E]/50 backdrop-blur rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold text-[#E8E3D3]" id="activeTime">0 min</div>
+                <div class="text-sm text-muted-foreground">Active Time</div>
+            </div>
+        </section>
+
+        <!-- Break Modal (Hidden by default) -->
+        <div id="breakModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div class="bg-[#2A1D2E] rounded-lg p-6 w-full max-w-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">Mindful Break</h3>
+                    <button onclick="skipBreak()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-center">
+                        <span class="bg-[#D1974E]/20 text-[#D1974E] px-3 py-1 rounded-full text-sm font-medium">
+                            📸 photo
+                        </span>
+                    </div>
+
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-primary mb-2" id="breakTitle">Pattern Hunt</h2>
+                        <p class="text-gray-500" id="breakDescription">Look for interesting patterns</p>
+                    </div>
+
+                    <div class="bg-[#201724] p-4 rounded-lg">
+                        <p class="text-sm text-center" id="breakInstruction">Capture a repeating pattern in your surroundings</p>
+                    </div>
+
+                    <div class="flex gap-2 pt-4">
+                        <button onclick="completeBreak()" class="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Complete
+                        </button>
+                        <button onclick="skipBreak()" class="flex-1 border border-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                            Skip
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">
+                This is a preview version. Install the full app for real step counting and mobile features!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let isCounting = false;
+        let steps = 0;
+        let nextBreakAt = 250;
+        let intervalId = null;
+        let currentBreakPrompt = null;
+
+        const prompts = [
+            { title: "Pattern Hunt", description: "Look for interesting patterns", instruction: "Capture a repeating pattern in your surroundings", type: "photo" },
+            { title: "Nature's Beauty", description: "Find something natural", instruction: "Take a photo of a plant, flower, or tree", type: "photo" },
+            { title: "Look Up", description: "Shift your gaze upward", instruction: "Look up and notice 3 things you haven't seen before", type: "sensory" },
+            { title: "Color Splash", description: "Find vibrant colors", instruction: "Photograph something with an interesting color combination", type: "photo" },
+            { title: "Listen Deeply", description: "Focus on sounds", instruction: "Close your eyes and identify 3 different sounds around you", type: "sensory" }
+        ];
+
+        function updateDisplay() {
+            document.getElementById('stepCount').textContent = steps.toLocaleString();
+            document.getElementById('distance').textContent = Math.round(steps * 0.000762 * 1000) + ' m';
+            document.getElementById('stepsUntilBreak').textContent = Math.max(0, nextBreakAt - steps);
+            
+            const progress = nextBreakAt > 0 ? ((steps % nextBreakAt) / nextBreakAt) * 100 : 0;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update ARIA attributes for accessibility
+            const progressContainer = document.getElementById('progressBar').parentElement;
+            progressContainer.setAttribute('aria-valuenow', Math.round(progress));
+            progressContainer.setAttribute('aria-label', `Progress to next mindful break: ${Math.round(progress)}% complete`);
+            
+            // Update stats
+            if (steps > 0) {
+                document.getElementById('stats').classList.remove('hidden');
+                document.getElementById('dailyProgress').textContent = Math.round(steps / 10000 * 100) + '%';
+                document.getElementById('activeTime').textContent = Math.floor(steps / 100) + ' min';
+            }
+
+            // Check for break
+            if (steps >= nextBreakAt && isCounting) {
+                triggerBreak();
+            }
+        }
+
+        function startCounting() {
+            isCounting = true;
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('pauseBtn').classList.remove('hidden');
+            document.getElementById('status').classList.remove('hidden');
+            document.getElementById('status').classList.add('flex');
+
+            // Simulate step counting
+            intervalId = setInterval(() => {
+                if (isCounting && Math.random() > 0.3) { // 70% chance to increment
+                    steps++;
+                    updateDisplay();
+                }
+            }, 500); // Update every 500ms for demo
+        }
+
+        function stopCounting() {
+            isCounting = false;
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('pauseBtn').classList.add('hidden');
+            document.getElementById('status').classList.add('hidden');
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function reset() {
+            stopCounting();
+            steps = 0;
+            nextBreakAt = Math.floor(Math.random() * 1400) + 100; // Random between 100-1500
+            updateDisplay();
+        }
+
+        function triggerBreak() {
+            stopCounting();
+            currentBreakPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+            
+            document.getElementById('breakTitle').textContent = currentBreakPrompt.title;
+            document.getElementById('breakDescription').textContent = currentBreakPrompt.description;
+            document.getElementById('breakInstruction').textContent = currentBreakPrompt.instruction;
+            
+            document.getElementById('breakModal').classList.remove('hidden');
+        }
+
+        function completeBreak() {
+            document.getElementById('breakModal').classList.add('hidden');
+            nextBreakAt = steps + Math.floor(Math.random() * 1400) + 100;
+            updateDisplay();
+            startCounting(); // Resume walking
+        }
+
+        function skipBreak() {
+            document.getElementById('breakModal').classList.add('hidden');
+            nextBreakAt = steps + Math.floor(Math.random() * 1400) + 100;
+            updateDisplay();
+            startCounting(); // Resume walking
+        }
+
+        // Initialize
+        reset();
+        updateDisplay();
+    </script>
+</body>
+</html>

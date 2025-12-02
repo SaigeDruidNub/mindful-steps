@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 255 28% 15%; /* #201724 */
+  --foreground: 30 30% 90%; /* #E8E3D3 */
+  --card: 255 28% 20%; /* #2A1D2E */
+  --card-foreground: 30 30% 90%; /* #E8E3D3 */
+  --popover: 255 28% 20%; /* #2A1D2E */
+  --popover-foreground: 30 30% 90%; /* #E8E3D3 */
+  --primary: 29 50% 57%; /* #D1974E */
+  --primary-foreground: 255 28% 15%; /* #201724 */
+  --secondary: 7 34% 32%; /* #713830 */
+  --secondary-foreground: 30 30% 90%; /* #E8E3D3 */
+  --muted: 255 28% 25%; /* #332233 */
+  --muted-foreground: 30 25% 75%; /* #C5BDB3 */
+  --accent: 218 22% 33%; /* #3F4C67 */
+  --accent-foreground: 30 30% 90%; /* #E8E3D3 */
+  --tertiary: 21 70% 43%; /* #B05833 */
+  --tertiary-foreground: 30 30% 90%; /* #E8E3D3 */
+  --destructive: 7 55% 48%; /* #D16548 */
+  --destructive-foreground: 30 30% 90%; /* #E8E3D3 */
+  --border: 255 28% 30%; /* #4D344D */
+  --input: 255 28% 25%; /* #332233 */
+  --ring: 29 50% 57%; /* #D1974E */
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 255 28% 15%; /* #201724 */
+  --foreground: 30 30% 90%; /* #E8E3D3 */
+  --card: 255 28% 20%; /* #2A1D2E */
+  --card-foreground: 30 30% 90%; /* #E8E3D3 */
+  --popover: 255 28% 20%; /* #2A1D2E */
+  --popover-foreground: 30 30% 90%; /* #E8E3D3 */
+  --primary: 29 50% 57%; /* #D1974E */
+  --primary-foreground: 255 28% 15%; /* #201724 */
+  --secondary: 7 34% 32%; /* #713830 */
+  --secondary-foreground: 30 30% 90%; /* #E8E3D3 */
+  --muted: 255 28% 25%; /* #332233 */
+  --muted-foreground: 30 25% 75%; /* #C5BDB3 */
+  --accent: 218 22% 33%; /* #3F4C67 */
+  --accent-foreground: 30 30% 90%; /* #E8E3D3 */
+  --tertiary: 21 70% 43%; /* #B05833 */
+  --tertiary-foreground: 30 30% 90%; /* #E8E3D3 */
+  --destructive: 7 55% 48%; /* #D16548 */
+  --destructive-foreground: 30 30% 90%; /* #E8E3D3 */
+  --border: 255 28% 30%; /* #4D344D */
+  --input: 255 28% 25%; /* #332233 */
+  --ring: 29 50% 57%; /* #D1974E */
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}

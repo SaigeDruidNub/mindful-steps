@@ -1,0 +1,12 @@
+# Ignore node_modules and other common build artifacts
+node_modules/
+dist/
+build/
+.env
+*.log
+.DS_Store
+.next/
+out/
+coverage/
+# Ignore OS-specific files
+Thumbs.db

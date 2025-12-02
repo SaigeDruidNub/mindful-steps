@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindful Steps - Emergency Reset</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .btn-secondary {
+            background: #64748b;
+        }
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .code {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Mindful Steps - Emergency Recovery</h1>
+        <p>Your app got stuck trying to load HTTPS. Let's fix this quickly.</p>
+        
+        <div class="warning">
+            <strong>Problem:</strong> The app is trying to load https://localhost:3000 but your development server doesn't support HTTPS.
+        </div>
+        
+        <h3>Step 1: Clear Browser State</h3>
+        <button class="btn" onclick="clearBrowserData()">Clear Browser Data for this Site</button>
+        <p class="code">This will remove cached HTTPS attempts and force HTTP</p>
+        
+        <h3>Step 2: Force HTTP</h3>
+        <button class="btn btn-secondary" onclick="forceHTTP()">Load App on HTTP</button>
+        <p class="code">This will redirect you to http://localhost:3000</p>
+        
+        <h3>Step 3: Kill Development Server</h3>
+        <div class="code">
+            In your terminal:<br>
+            1. Press Ctrl+C to stop the server<br>
+            2. Run: rm -rf .next<br>
+            3. Run: npm run dev
+        </div>
+        
+        <h3>Step 4: Alternative Access</h3>
+        <button class="btn" onclick="window.location.href='http://127.0.0.1:3000'">Try 127.0.0.1 Instead</button>
+        <p class="code">Sometimes 127.0.0.1 works better than localhost</p>
+    </div>
+    
+    <div class="card">
+        <h2>What Happened?</h2>
+        <p>The app tried to force HTTPS for Google Maps, but development servers don't support HTTPS by default. This caused the browser to get stuck in a redirect loop.</p>
+        
+        <h3>Quick Fix Commands:</h3>
+        <div class="code">
+            # In your terminal (Ctrl+C to stop current server first)<br>
+            rm -rf .next<br>
+            npm run dev
+        </div>
+    </div>
+    
+    <div class="success">
+        <strong>Recommended Solution:</strong><br>
+        1. Press Ctrl+C in your terminal<br>
+        2. Run: rm -rf .next && npm run dev<br>
+        3. Go to: http://localhost:3000<br>
+        4. Click "Storage" → "Clear" in the app<br>
+        5. The app will work with the simple map
+    </div>
+
+    <script>
+        function clearBrowserData() {
+            if (confirm('This will clear all data for localhost:3000 and reload the page. Continue?')) {
+                // Clear localStorage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear cookies
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                
+                // Force reload
+                window.location.href = 'http://localhost:3000';
+            }
+        }
+        
+        function forceHTTP() {
+            window.location.href = 'http://localhost:3000';
+        }
+        
+        // Auto-redirect after 5 seconds
+        setTimeout(() => {
+            if (confirm('Auto-redirecting to HTTP in 5 seconds. Continue?')) {
+                window.location.href = 'http://localhost:3000';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
