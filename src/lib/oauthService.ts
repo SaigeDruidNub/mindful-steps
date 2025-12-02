@@ -1,4 +1,9 @@
-import { API_CONFIG, setUserToken, clearUserToken, getUserToken } from '@/config/api';
+import {
+  API_CONFIG,
+  setUserToken,
+  clearUserToken,
+  getUserToken,
+} from "@/config/api";
 
 // User profile interface
 export interface UserProfile {
@@ -6,7 +11,7 @@ export interface UserProfile {
   email: string;
   name: string;
   avatar?: string;
-  provider: 'google' | 'apple';
+  provider: "google" | "apple";
   createdAt: string;
   lastLogin: string;
 }
@@ -20,18 +25,22 @@ export interface AuthState {
 }
 
 export class OAuthService {
-  private static readonly REDIRECT_URI = `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/auth/callback`;
-  
+  private static readonly REDIRECT_URI = `${
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000"
+  }/auth/callback`;
+
   // Google OAuth
   static initiateGoogleLogin(): void {
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    authUrl.searchParams.set('client_id', API_CONFIG.GOOGLE_CLIENT_ID);
-    authUrl.searchParams.set('redirect_uri', this.REDIRECT_URI);
-    authUrl.searchParams.set('response_type', 'code');
-    authUrl.searchParams.set('scope', 'openid email profile');
-    authUrl.searchParams.set('access_type', 'offline');
-    authUrl.searchParams.set('prompt', 'consent');
-    
+    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    authUrl.searchParams.set("client_id", API_CONFIG.GOOGLE_CLIENT_ID);
+    authUrl.searchParams.set("redirect_uri", this.REDIRECT_URI);
+    authUrl.searchParams.set("response_type", "code");
+    authUrl.searchParams.set("scope", "openid email profile");
+    authUrl.searchParams.set("access_type", "offline");
+    authUrl.searchParams.set("prompt", "consent");
+
     window.location.href = authUrl.toString();
   }
 
@@ -46,7 +55,7 @@ export class OAuthService {
   //       redirectURI: this.REDIRECT_URI,
   //       usePopup: true,
   //     });
-  //     
+  //
   //     (window as any).AppleID.auth.signIn();
   //   } else {
   //     console.error('Apple Sign In SDK not loaded');
@@ -54,44 +63,55 @@ export class OAuthService {
   // }
 
   // Handle OAuth callback (Google only)
-  static async handleAuthCallback(code: string, provider: 'google'): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
+  static async handleAuthCallback(
+    code: string,
+    provider: "google"
+  ): Promise<{
+    success: boolean;
+    user?: UserProfile;
+    token?: string;
+    error?: string;
+  }> {
     try {
-      console.log('Attempting OAuth callback to:', API_CONFIG.API_BASE_URL);
-      console.log('With code:', code ? 'present' : 'missing');
-      
-      const response = await fetch(`${API_CONFIG.API_BASE_URL}/auth/google/callback`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code,
-          redirectUri: this.REDIRECT_URI,
-        }),
-      });
+      console.log("Attempting OAuth callback to:", API_CONFIG.API_BASE_URL);
+      console.log("With code:", code ? "present" : "missing");
 
-      console.log('Response status:', response.status);
-      
+      const response = await fetch(
+        `${API_CONFIG.API_BASE_URL}/auth/google/callback`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            code,
+            redirectUri: this.REDIRECT_URI,
+          }),
+        }
+      );
+
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Response error:', errorText);
+        console.error("Response error:", errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Response data:', data);
-      
+      console.log("Response data:", data);
+
       if (data.token && data.user) {
         setUserToken(data.token);
-        return { success: true, user: data.user };
+        return { success: true, user: data.user, token: data.token };
       } else {
-        throw new Error('Invalid authentication response');
+        throw new Error("Invalid authentication response");
       }
     } catch (error) {
-      console.error('Auth callback error:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Authentication failed' 
+      console.error("Auth callback error:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Authentication failed",
       };
     }
   }
@@ -104,13 +124,13 @@ export class OAuthService {
     // For now, just check localStorage for user data
     // This avoids API calls during initial auth check
     try {
-      const userStr = localStorage.getItem('mindful-steps-user');
+      const userStr = localStorage.getItem("mindful-steps-user");
       if (userStr) {
         return JSON.parse(userStr);
       }
       return null;
     } catch (error) {
-      console.error('Failed to get user from localStorage:', error);
+      console.error("Failed to get user from localStorage:", error);
       return null;
     }
   }
@@ -122,13 +142,13 @@ export class OAuthService {
 
     try {
       await fetch(`${API_CONFIG.API_BASE_URL}/auth/logout`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       clearUserToken();
     }
@@ -141,9 +161,9 @@ export class OAuthService {
 
     try {
       const response = await fetch(`${API_CONFIG.API_BASE_URL}/auth/refresh`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -156,7 +176,7 @@ export class OAuthService {
         return false;
       }
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      console.error("Token refresh failed:", error);
       clearUserToken();
       return false;
     }

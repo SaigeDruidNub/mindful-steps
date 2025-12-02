@@ -1,20 +1,30 @@
-import { useState, useEffect, useCallback } from 'react';
-import { WalkLog, StepGoal, WalkStreak } from '@/types';
-import { VultrStorageService } from '@/lib/vultrStorage';
+import { useState, useEffect, useCallback } from "react";
+import { WalkLog, StepGoal, WalkStreak } from "@/types";
+import { VultrStorageService } from "@/lib/vultrStorage";
 
 export function useWalkLogWithVultr() {
   const [logs, setLogs] = useState<WalkLog[]>([]);
-  const [goals, setGoals] = useState<StepGoal>({ daily: 5000, weekly: 35000, monthly: 150000 });
-  const [streak, setStreak] = useState<WalkStreak>({ current: 0, longest: 0, lastWalkDate: '' });
+  const [goals, setGoals] = useState<StepGoal>({
+    daily: 5000,
+    weekly: 35000,
+    monthly: 150000,
+  });
+  const [streak, setStreak] = useState<WalkStreak>({
+    current: 0,
+    longest: 0,
+    lastWalkDate: "",
+  });
   const [activeWalk, setActiveWalk] = useState<WalkLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(true);
-  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'offline'>('synced');
+  const [syncStatus, setSyncStatus] = useState<
+    "synced" | "syncing" | "offline"
+  >("synced");
 
   // Load data on mount
   useEffect(() => {
     loadData();
-    
+
     // Set up online/offline detection
     const handleOnline = () => {
       setIsOnline(true);
@@ -22,15 +32,15 @@ export function useWalkLogWithVultr() {
     };
     const handleOffline = () => {
       setIsOnline(false);
-      setSyncStatus('offline');
+      setSyncStatus("offline");
     };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
@@ -47,16 +57,16 @@ export function useWalkLogWithVultr() {
       setLogs(logsData);
       setGoals(goalsData);
       setStreak(streakData);
-      
-      const active = logsData.find(log => !log.endTime);
+
+      const active = logsData.find((log) => !log.endTime);
       setActiveWalk(active || null);
-      
+
       // Try to sync any queued data
       if (navigator.onLine) {
         await VultrStorageService.syncQueuedData();
       }
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error("Failed to load data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -65,191 +75,212 @@ export function useWalkLogWithVultr() {
   // Sync data when coming back online
   const syncData = async () => {
     if (!isOnline) return;
-    
-    setSyncStatus('syncing');
+
+    setSyncStatus("syncing");
     try {
       await VultrStorageService.syncQueuedData();
       await loadData();
-      setSyncStatus('synced');
+      setSyncStatus("synced");
     } catch (error) {
-      console.error('Sync failed:', error);
-      setSyncStatus('offline');
+      console.error("Sync failed:", error);
+      setSyncStatus("offline");
     }
   };
 
-  const startWalk = useCallback((
-    startSteps: number,
-    startDistance: number,
-    startLocation?: { lat: number; lng: number; address?: string }
-  ) => {
-    const now = Date.now();
-    const newWalk: WalkLog = {
-      id: `walk-${now}`,
-      date: new Date().toISOString().split('T')[0],
-      startTime: now,
-      steps: startSteps,
-      distance: startDistance,
-      duration: 0,
-      mindfulBreaksCompleted: 0,
-      startLocation
-    };
+  const startWalk = useCallback(
+    (
+      startSteps: number,
+      startDistance: number,
+      startLocation?: { lat: number; lng: number; address?: string }
+    ) => {
+      const now = Date.now();
+      const newWalk: WalkLog = {
+        id: `walk-${now}`,
+        date: new Date().toISOString().split("T")[0],
+        startTime: now,
+        steps: startSteps,
+        distance: startDistance,
+        duration: 0,
+        mindfulBreaksCompleted: 0,
+        startLocation,
+      };
 
-    // Save asynchronously
-    VultrStorageService.saveLog(newWalk).catch(error => {
-      console.error('Failed to save walk to cloud:', error);
-    });
+      // Save asynchronously
+      VultrStorageService.saveLog(newWalk).catch((error) => {
+        console.error("Failed to save walk to cloud:", error);
+      });
 
-    setActiveWalk(newWalk);
-    setLogs(prev => [newWalk, ...prev]);
-    
-    return newWalk;
-  }, []);
+      setActiveWalk(newWalk);
+      setLogs((prev) => [newWalk, ...prev]);
 
-  const updateWalk = useCallback((
-    walkId: string,
-    updates: Partial<WalkLog>
-  ) => {
-    const walk = logs.find(l => l.id === walkId);
-    if (!walk) return;
+      return newWalk;
+    },
+    []
+  );
 
-    const updatedWalk = { ...walk, ...updates };
-    
-    // Save asynchronously
-    VultrStorageService.saveLog(updatedWalk).catch(error => {
-      console.error('Failed to update walk in cloud:', error);
-    });
+  const updateWalk = useCallback(
+    (walkId: string, updates: Partial<WalkLog>) => {
+      const walk = logs.find((l) => l.id === walkId);
+      if (!walk) return;
 
-    setLogs(prev => prev.map(l => l.id === walkId ? updatedWalk : l));
-    setActiveWalk(prev => prev?.id === walkId ? updatedWalk : prev);
-    
-    return updatedWalk;
-  }, [logs]);
+      const updatedWalk = { ...walk, ...updates };
 
-  const endWalk = useCallback((
-    walkId: string,
-    endSteps: number,
-    endDistance: number,
-    endLocation?: { lat: number; lng: number; address?: string },
-    mood?: { before: number; after: number },
-    notes?: string
-  ) => {
-    const walk = logs.find(l => l.id === walkId);
-    if (!walk) return;
+      // Save asynchronously
+      VultrStorageService.saveLog(updatedWalk).catch((error) => {
+        console.error("Failed to update walk in cloud:", error);
+      });
 
-    const endTime = Date.now();
-    const duration = Math.round((endTime - walk.startTime) / 60000); // minutes
-    const stepsWalked = endSteps - walk.steps;
-    const distanceWalked = endDistance - walk.distance;
-    const averagePace = distanceWalked > 0 ? duration / distanceWalked : undefined;
+      setLogs((prev) => prev.map((l) => (l.id === walkId ? updatedWalk : l)));
+      setActiveWalk((prev) => (prev?.id === walkId ? updatedWalk : prev));
 
-    const updatedWalk: WalkLog = {
-      ...walk,
-      endTime,
-      steps: stepsWalked,
-      distance: distanceWalked,
-      duration,
-      averagePace,
-      endLocation,
-      mood,
-      notes
-    };
+      return updatedWalk;
+    },
+    [logs]
+  );
 
-    // Save asynchronously
-    Promise.all([
-      VultrStorageService.saveLog(updatedWalk),
+  const endWalk = useCallback(
+    (
+      walkId: string,
+      endSteps: number,
+      endDistance: number,
+      endLocation?: { lat: number; lng: number; address?: string },
+      mood?: { before: number; after: number },
+      notes?: string
+    ) => {
+      const walk = logs.find((l) => l.id === walkId);
+      if (!walk) return;
+
+      const endTime = Date.now();
+      const duration = Math.round((endTime - walk.startTime) / 60000); // minutes
+      const stepsWalked = endSteps - walk.steps;
+      const distanceWalked = endDistance - walk.distance;
+      const averagePace =
+        distanceWalked > 0 ? duration / distanceWalked : undefined;
+
+      const updatedWalk: WalkLog = {
+        ...walk,
+        endTime,
+        steps: stepsWalked,
+        distance: distanceWalked,
+        duration,
+        averagePace,
+        endLocation,
+        mood,
+        notes,
+      };
+
+      // Save asynchronously
+      Promise.all([
+        VultrStorageService.saveLog(updatedWalk),
+        VultrStorageService.updateStreak(walk.date),
+      ]).catch((error) => {
+        console.error("Failed to save walk data to cloud:", error);
+      });
+
+      setLogs((prev) => prev.map((l) => (l.id === walkId ? updatedWalk : l)));
+
+      // Update streak asynchronously
       VultrStorageService.updateStreak(walk.date)
-    ]).catch(error => {
-      console.error('Failed to save walk data to cloud:', error);
-    });
+        .then((newStreak) => {
+          setStreak(newStreak);
+        })
+        .catch((error) => {
+          console.error("Failed to update streak:", error);
+        });
 
-    setLogs(prev => prev.map(l => l.id === walkId ? updatedWalk : l));
-    
-    // Update streak asynchronously
-    VultrStorageService.updateStreak(walk.date).then(newStreak => {
-      setStreak(newStreak);
-    }).catch(error => {
-      console.error('Failed to update streak:', error);
-    });
-    
-    setActiveWalk(null);
-    
-    return updatedWalk;
-  }, [logs]);
-
-  const deleteWalk = useCallback((walkId: string) => {
-    VultrStorageService.deleteLog(walkId).catch(error => {
-      console.error('Failed to delete walk from cloud:', error);
-    });
-
-    setLogs(prev => prev.filter(l => l.id !== walkId));
-    if (activeWalk?.id === walkId) {
       setActiveWalk(null);
-    }
-  }, [activeWalk]);
+
+      return updatedWalk;
+    },
+    [logs]
+  );
+
+  const deleteWalk = useCallback(
+    (walkId: string) => {
+      VultrStorageService.deleteLog(walkId).catch((error) => {
+        console.error("Failed to delete walk from cloud:", error);
+      });
+
+      setLogs((prev) => prev.filter((l) => l.id !== walkId));
+      if (activeWalk?.id === walkId) {
+        setActiveWalk(null);
+      }
+    },
+    [activeWalk]
+  );
 
   const updateGoals = useCallback((newGoals: StepGoal) => {
-    VultrStorageService.saveGoals(newGoals).catch(error => {
-      console.error('Failed to save goals to cloud:', error);
+    VultrStorageService.saveGoals(newGoals).catch((error) => {
+      console.error("Failed to save goals to cloud:", error);
     });
     setGoals(newGoals);
   }, []);
 
-  const addPhotoToWalk = useCallback((walkId: string, photoUrl: string) => {
-    const walk = logs.find(l => l.id === walkId);
-    if (!walk) return;
+  const addPhotoToWalk = useCallback(
+    (walkId: string, photoUrl: string) => {
+      const walk = logs.find((l) => l.id === walkId);
+      if (!walk) return;
 
-    const photos = walk.photos || [];
-    const updatedWalk = {
-      ...walk,
-      photos: [...photos, photoUrl]
-    };
+      const photos = walk.photos || [];
+      const updatedWalk = {
+        ...walk,
+        photos: [...photos, photoUrl],
+      };
 
-    VultrStorageService.saveLog(updatedWalk).catch(error => {
-      console.error('Failed to add photo to walk in cloud:', error);
-    });
+      VultrStorageService.saveLog(updatedWalk).catch((error) => {
+        console.error("Failed to add photo to walk in cloud:", error);
+      });
 
-    setLogs(prev => prev.map(l => l.id === walkId ? updatedWalk : l));
-    
-    return updatedWalk;
-  }, [logs]);
+      setLogs((prev) => prev.map((l) => (l.id === walkId ? updatedWalk : l)));
 
-  const addMindfulBreak = useCallback((walkId: string) => {
-    const walk = logs.find(l => l.id === walkId);
-    if (!walk) return;
+      return updatedWalk;
+    },
+    [logs]
+  );
 
-    const updatedWalk = {
-      ...walk,
-      mindfulBreaksCompleted: walk.mindfulBreaksCompleted + 1
-    };
+  const addMindfulBreak = useCallback(
+    (walkId: string) => {
+      const walk = logs.find((l) => l.id === walkId);
+      if (!walk) return;
 
-    VultrStorageService.saveLog(updatedWalk).catch(error => {
-      console.error('Failed to add mindful break to walk in cloud:', error);
-    });
+      const updatedWalk = {
+        ...walk,
+        mindfulBreaksCompleted: walk.mindfulBreaksCompleted + 1,
+      };
 
-    setLogs(prev => prev.map(l => l.id === walkId ? updatedWalk : l));
-    
-    return updatedWalk;
-  }, [logs]);
+      VultrStorageService.saveLog(updatedWalk).catch((error) => {
+        console.error("Failed to add mindful break to walk in cloud:", error);
+      });
+
+      setLogs((prev) => prev.map((l) => (l.id === walkId ? updatedWalk : l)));
+
+      return updatedWalk;
+    },
+    [logs]
+  );
 
   // Get statistics
   const getTodayStats = useCallback(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const todayLogs = logs.filter(log => log.date === today);
-    
-    const stats = todayLogs.reduce((acc, log) => ({
-      totalSteps: acc.totalSteps + log.steps,
-      totalDistance: acc.totalDistance + log.distance,
-      totalDuration: acc.totalDuration + log.duration,
-      walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0)
-    }), {
-      totalSteps: 0,
-      totalDistance: 0,
-      totalDuration: 0,
-      walksCompleted: 0
-    });
-    
+    const today = new Date().toISOString().split("T")[0];
+    const todayLogs = logs.filter((log) => log.date === today);
+
+    const stats = todayLogs.reduce(
+      (acc, log) => ({
+        totalSteps: acc.totalSteps + log.steps,
+        totalDistance: acc.totalDistance + log.distance,
+        totalDuration: acc.totalDuration + log.duration,
+        walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0),
+        goalProgress: acc.goalProgress, // carry forward, will set after
+      }),
+      {
+        totalSteps: 0,
+        totalDistance: 0,
+        totalDuration: 0,
+        walksCompleted: 0,
+        goalProgress: 0,
+      }
+    );
     stats.goalProgress = (stats.totalSteps / goals.daily) * 100;
-    
     return stats;
   }, [logs, goals.daily]);
 
@@ -257,30 +288,33 @@ export function useWalkLogWithVultr() {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
     weekStart.setHours(0, 0, 0, 0);
-    
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
     weekEnd.setHours(23, 59, 59, 999);
-    
-    const weekLogs = logs.filter(log => {
+
+    const weekLogs = logs.filter((log) => {
       const logDate = new Date(log.date);
       return logDate >= weekStart && logDate <= weekEnd;
     });
-    
-    const stats = weekLogs.reduce((acc, log) => ({
-      totalSteps: acc.totalSteps + log.steps,
-      totalDistance: acc.totalDistance + log.distance,
-      totalDuration: acc.totalDuration + log.duration,
-      walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0)
-    }), {
-      totalSteps: 0,
-      totalDistance: 0,
-      totalDuration: 0,
-      walksCompleted: 0
-    });
-    
+
+    const stats = weekLogs.reduce(
+      (acc, log) => ({
+        totalSteps: acc.totalSteps + log.steps,
+        totalDistance: acc.totalDistance + log.distance,
+        totalDuration: acc.totalDuration + log.duration,
+        walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0),
+        goalProgress: acc.goalProgress, // carry forward, will set after
+      }),
+      {
+        totalSteps: 0,
+        totalDistance: 0,
+        totalDuration: 0,
+        walksCompleted: 0,
+        goalProgress: 0,
+      }
+    );
     stats.goalProgress = (stats.totalSteps / goals.weekly) * 100;
-    
     return stats;
   }, [logs, goals.weekly]);
 
@@ -288,44 +322,47 @@ export function useWalkLogWithVultr() {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    
-    const monthLogs = logs.filter(log => {
+
+    const monthLogs = logs.filter((log) => {
       const logDate = new Date(log.date);
       return logDate >= monthStart && logDate <= monthEnd;
     });
-    
-    const stats = monthLogs.reduce((acc, log) => ({
-      totalSteps: acc.totalSteps + log.steps,
-      totalDistance: acc.totalDistance + log.distance,
-      totalDuration: acc.totalDuration + log.duration,
-      walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0)
-    }), {
-      totalSteps: 0,
-      totalDistance: 0,
-      totalDuration: 0,
-      walksCompleted: 0
-    });
-    
+
+    const stats = monthLogs.reduce(
+      (acc, log) => ({
+        totalSteps: acc.totalSteps + log.steps,
+        totalDistance: acc.totalDistance + log.distance,
+        totalDuration: acc.totalDuration + log.duration,
+        walksCompleted: acc.walksCompleted + (log.endTime ? 1 : 0),
+        goalProgress: acc.goalProgress, // carry forward, will set after
+      }),
+      {
+        totalSteps: 0,
+        totalDistance: 0,
+        totalDuration: 0,
+        walksCompleted: 0,
+        goalProgress: 0,
+      }
+    );
     stats.goalProgress = (stats.totalSteps / goals.monthly) * 100;
-    
     return stats;
   }, [logs, goals.monthly]);
 
   // Migration helper
   const migrateFromLocalStorage = useCallback(async () => {
     try {
-      setSyncStatus('syncing');
+      setSyncStatus("syncing");
       const success = await VultrStorageService.migrateFromLocalStorage();
       if (success) {
         await loadData();
-        setSyncStatus('synced');
+        setSyncStatus("synced");
       } else {
-        setSyncStatus('offline');
+        setSyncStatus("offline");
       }
       return success;
     } catch (error) {
-      console.error('Migration failed:', error);
-      setSyncStatus('offline');
+      console.error("Migration failed:", error);
+      setSyncStatus("offline");
       return false;
     }
   }, []);
@@ -349,6 +386,6 @@ export function useWalkLogWithVultr() {
     getWeeklyStats,
     getMonthlyStats,
     migrateFromLocalStorage,
-    syncData
+    syncData,
   };
 }
