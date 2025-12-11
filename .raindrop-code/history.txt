@@ -274,6 +274,141 @@ Vultr is saving images but does not appear to be saving walk data
 let's see if you're working today - I want to add badges for steps walked, photos taken, mindful moments completed, etc
 Unhandled Runtime Error
 ReferenceError: Cannot access 'stepData' before initialization
-
 Source
 src\app\page.tsx (26:6) @ stepData
+how do I deploy on raindrop?
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> npm install -g @liquidmetal-ai/raindrop-cli
+npm notice Access token expired or revoked. Please try logging in again.
+Logged in on https://registry.npmjs.org/.
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> npm install -g @liquidmetal-ai/raindrop-cli
+npm notice Access token expired or revoked. Please try logging in again.
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/@liquidmetal-ai%2fraindrop-cli - Not found   
+npm error 404
+npm error 404  The requested resource '@liquidmetal-ai/raindrop-cli@*' could not be found or you do not have permission to access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: C:\Users\jayde\AppData\Local\npm-cache\_logs\2025-12-11T16_28_34_279Z-debug-0.log
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> raindrop generate
+command generate not found
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> raindrop build generate
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> raindrop build deploy
+
+  Security Warning: src/_app/cors.ts exports corsAllowAll (allows all origins)
+   Consider using createCorsHandler() with specific origins for production.
+
+Building to C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps\dist
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: spawn npx ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:285:19)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on ChildProcess instance at:
+    at ChildProcess._handle.onexit (node:internal/child_process:291:12)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'spawn npx',
+  path: 'npx',
+  spawnargs: [ 'tsc', '--noEmit' ]
+}
+
+Node.js v22.14.0
+Found 24 errors in 8 files.
+
+Errors  Files
+     1  src/_app/cors.ts:1
+     1  src/api/index.test.ts:1
+     7  src/api/index.ts:2
+     1  src/photo-processor/index.test.ts:1
+     2  src/raindrop/api.ts:2
+     4  src/raindrop/photo-processor.ts:1
+     6  src/raindrop/walk-analyzer.ts:1
+     2  src/walk-analyzer/index.test.ts:22
+Found 27 errors in 11 files.
+
+Errors  Files
+     1  src/api/index.test.ts:1
+     2  src/api/index.ts:5
+     1  src/api/raindrop.gen.ts:15
+     1  src/photo-processor/index.test.ts:1
+     3  src/photo-processor/index.ts:1
+     1  src/photo-processor/raindrop.gen.ts:16
+     3  src/raindrop/api.ts:5
+     4  src/raindrop/photo-processor.ts:1
+     6  src/raindrop/walk-analyzer.ts:1
+     2  src/walk-analyzer/index.test.ts:22
+     3  src/walk-analyzer/index.ts:1
+Found 13 errors in 5 files.
+
+Errors  Files
+     2  src/photo-processor/index.ts:1
+     1  src/raindrop/api.ts:35
+     3  src/raindrop/photo-processor.ts:1
+     5  src/raindrop/walk-analyzer.ts:1
+     2  src/walk-analyzer/index.ts:1
+Found 9 errors in 5 files.
+
+Errors  Files
+     1  src/photo-processor/index.ts:1
+     1  src/raindrop/api.ts:36
+     2  src/raindrop/photo-processor.ts:1
+     4  src/raindrop/walk-analyzer.ts:1
+     1  src/walk-analyzer/index.ts:1
+Found 8 errors in 4 files.
+
+Errors  Files
+     1  src/photo-processor/index.ts:1
+     2  src/raindrop/photo-processor.ts:1
+     4  src/raindrop/walk-analyzer.ts:1
+     1  src/walk-analyzer/index.ts:1
+I think we're all clear for type errors...what's next
+PS C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps> raindrop build deploy
+Building to C:\Users\jayde\Documents\Nubbernaut\new-raindrop-code\mindful-steps\dist
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: spawn npx ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:285:19)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on ChildProcess instance at:
+    at ChildProcess._handle.onexit (node:internal/child_process:291:12)
+    at onErrorNT (node:internal/child_process:483:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'spawn npx',
+  path: 'npx',
+  spawnargs: [ 'tsc', '--noEmit' ]
+}
+
+Node.js v22.14.0
+check-node.bat : The term 'check-node.bat' is not recognized as the name of a cmdlet, function, 
+script file, or operable program. Check the spelling of the name, or if a path was included, verify   
+that the path is correct and try again.
+At line:1 char:2
++  check-node.bat
++  ~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (check-node.bat:String) [], CommandNotFoundException    
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+
+Suggestion [3,General]: The command check-node.bat was not found, but does exist in the current location. Windows PowerShell does not load commands from the current location by default. If you trust this command, instead type: ".\check-node.bat". See "get-help about_Command_Precedence" for more details.
+Checking Node.js installation...
+Checking common locations...
+Found: C:\Program Files\nodejs\node.exe
+Found: C:\Program Files\nodejs\npx.cmd
+
+Testing npx...
+11.5.2
+Deploying to Raindrop...
+
+\Common was unexpected at this time.
+Deployment Complete!

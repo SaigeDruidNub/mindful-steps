@@ -1,0 +1,30 @@
+application "mindful-steps" {
+  
+  // API service for user data and walk logs
+  service "api" {
+    visibility = "public"
+  }
+
+  // SQL database for user data, walk logs, achievements
+  sql_database "app-data" {}
+
+  // Bucket for storing user photos
+  bucket "user-photos" {}
+
+  // Queue for processing walk data asynchronously
+  queue "walk-processor" {}
+
+  // Observer for processing uploaded photos
+  observer "photo-processor" {
+    source {
+      bucket = "user-photos"
+    }
+  }
+
+  // Observer for processing walk data
+  observer "walk-analyzer" {
+    source {
+      queue = "walk-processor"
+    }
+  }
+}

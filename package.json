@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "raindrop-build": "tsc --noEmit && raindrop build deploy"
   },
   "dependencies": {
     "@types/node": "^20",
@@ -27,6 +29,7 @@
     "typescript": "^5"
   },
   "devDependencies": {
+    "@liquidmetal-ai/raindrop-framework": "^0.12.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.0"
   }
